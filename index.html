@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .secondary-btn {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            margin-top: 10px;
+        }
+
+        .secondary-btn:hover {
+            background: #f8f9ff;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .todo-list {
+            margin-top: 30px;
+        }
+
+        .todo-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .todo-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .todo-item.completed {
+            opacity: 0.6;
+        }
+
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+        }
+
+        .todo-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .todo-text {
+            flex: 1;
+            color: #333;
+            font-size: 15px;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            margin-top: 20px;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            box-shadow: 0 10px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .user-info strong {
+            color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="screen active">
+            <h1>📝 Todo App</h1>
+            <p class="subtitle">Organize your life, one task at a time</p>
+            <button onclick="showSignIn()">Sign In</button>
+            <button class="secondary-btn" onclick="showSignUp()">Create Account</button>
+        </div>
+
+        <!-- Sign Up Screen -->
+        <div id="signupScreen" class="screen">
+            <h1>Create Account</h1>
+            <p class="subtitle">Join us to start organizing your tasks</p>
+            <div id="signupMessage"></div>
+            <form onsubmit="handleSignUp(event)">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required placeholder="Choose a strong password">
+                </div>
+                <button type="submit">Sign Up</button>
+                <button type="button" class="secondary-btn" onclick="showWelcome()">Back</button>
+            </form>
+        </div>
+
+        <!-- Sign In Screen -->
+        <div id="signinScreen" class="screen">
+            <h1>Welcome Back</h1>
+            <p class="subtitle">Sign in to continue organizing</p>
+            <div id="signinMessage"></div>
+            <form onsubmit="handleSignIn(event)">
+                <div class="form-group">
+                    <label for="signinEmail">Email</label>
+                    <input type="email" id="signinEmail" required placeholder="your@email.com">
+                </div>
+                <div class="form-group">
+                    <label for="signinPassword">Password</label>
+                    <input type="password" id="signinPassword" required placeholder="Enter your password">
+                </div>
+                <button type="submit">Sign In</button>
+                <button type="button" class="secondary-btn" onclick="showWelcome()">Back</button>
+            </form>
+        </div>
+
+        <!-- Todo Screen -->
+        <div id="todoScreen" class="screen">
+            <h1>My Todos</h1>
+            <div class="user-info">
+                <span>Logged in as <strong id="userEmail"></strong></span>
+            </div>
+            <div id="todoMessage"></div>
+            <form onsubmit="handleAddTodo(event)">
+                <div class="form-group">
+                    <label for="todoTitle">New Todo</label>
+                    <input type="text" id="todoTitle" required placeholder="What needs to be done?">
+                </div>
+                <button type="submit">Add Todo</button>
+            </form>
+            <div class="todo-list" id="todoList"></div>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+    </div>
+
+    <script>
+        let authToken = null;
+        let userEmail = null;
+        let todos = [];
+
+        // Screen Navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showWelcome() {
+            showScreen('welcomeScreen');
+        }
+
+        function showSignUp() {
+            showScreen('signupScreen');
+            document.getElementById('signupMessage').innerHTML = '';
+        }
+
+        function showSignIn() {
+            showScreen('signinScreen');
+            document.getElementById('signinMessage').innerHTML = '';
+        }
+
+        function showTodos() {
+            showScreen('todoScreen');
+            document.getElementById('userEmail').textContent = userEmail;
+            loadTodos();
+        }
+
+        // Show Message
+        function showMessage(elementId, message, type) {
+            const messageEl = document.getElementById(elementId);
+            messageEl.innerHTML = `<div class="message ${type}">${message}</div>`;
+            setTimeout(() => {
+                messageEl.innerHTML = '';
+            }, 3000);
+        }
+
+        // Sign Up
+        async function handleSignUp(event) {
+            event.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('signupMessage', 'Account created successfully! Please sign in.', 'success');
+                    setTimeout(() => {
+                        showSignIn();
+                        document.getElementById('signinEmail').value = email;
+                    }, 2000);
+                } else {
+                    showMessage('signupMessage', data.message || 'Sign up failed', 'error');
+                }
+            } catch (error) {
+                showMessage('signupMessage', 'Network error. Please try again.', 'error');
+            }
+        }
+
+        // Sign In
+        async function handleSignIn(event) {
+            event.preventDefault();
+            const email = document.getElementById('signinEmail').value;
+            const password = document.getElementById('signinPassword').value;
+
+            try {
+                const response = await fetch('/signin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.token;
+                    userEmail = email;
+                    showMessage('signinMessage', 'Sign in successful!', 'success');
+                    setTimeout(() => {
+                        showTodos();
+                    }, 1000);
+                } else {
+                    showMessage('signinMessage', data.message || 'Invalid credentials', 'error');
+                }
+            } catch (error) {
+                showMessage('signinMessage', 'Network error. Please try again.', 'error');
+            }
+        }
+
+        // Add Todo
+        async function handleAddTodo(event) {
+            event.preventDefault();
+            const title = document.getElementById('todoTitle').value;
+
+            try {
+                const response = await fetch('/todo', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': authToken
+                    },
+                    body: JSON.stringify({ title, done: false })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('todoMessage', 'Todo added successfully!', 'success');
+                    document.getElementById('todoTitle').value = '';
+                    loadTodos();
+                } else {
+                    showMessage('todoMessage', data.message || 'Failed to add todo', 'error');
+                }
+            } catch (error) {
+                showMessage('todoMessage', 'Network error. Please try again.', 'error');
+            }
+        }
+
+        // Load Todos
+        async function loadTodos() {
+            try {
+                const response = await fetch('/todos', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': authToken
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Note: The current backend only returns userId
+                    // You'll need to modify the backend to return actual todos
+                    renderTodos([]);
+                }
+            } catch (error) {
+                console.error('Error loading todos:', error);
+                renderTodos([]);
+            }
+        }
+
+        // Render Todos
+        function renderTodos(todoList) {
+            const todoListEl = document.getElementById('todoList');
+            
+            if (todoList.length === 0) {
+                todoListEl.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h6a1 1 0 100-2H7zm0 4a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/>
+                        </svg>
+                        <p>No todos yet. Add your first task above!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            todoListEl.innerHTML = todoList.map(todo => `
+                <div class="todo-item ${todo.done ? 'completed' : ''}">
+                    <input type="checkbox" class="todo-checkbox" ${todo.done ? 'checked' : ''} 
+                           onchange="toggleTodo('${todo._id}', this.checked)">
+                    <span class="todo-text">${todo.title}</span>
+                </div>
+            `).join('');
+        }
+
+        // Toggle Todo (for future implementation)
+        function toggleTodo(todoId, done) {
+            console.log('Toggle todo:', todoId, done);
+            // You'll need to add a PUT/PATCH endpoint in the backend
+        }
+
+        // Logout
+        function handleLogout() {
+            authToken = null;
+            userEmail = null;
+            todos = [];
+            showWelcome();
+        }
+
+        // Check if user is already logged in (in case of page refresh)
+        window.onload = function() {
+            // You could implement localStorage to persist login state
+            showWelcome();
+        };
+    </script>
+</body>
+</html>
