@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 mongoose.connect(
-  "mongodb+srv://Luxaycodes:Hello123@luxaycodes.gkae7tf.mongodb.net/todoapp",
+  "mongodb+srv://.net/todoapp",
 )
 
 const JWT_SECRET = "luxayki_jwt_secret_key";
